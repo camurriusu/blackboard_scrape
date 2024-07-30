@@ -9,16 +9,18 @@ import urllib
 import os
 import re
 
-COURSE_NUM = ''
+COURSE_NUM = '' # Navigate to course page check URL for: _{COURSE_NUM}_1
 EMAIL = ''
 PASSWORD = ''
-PC_USER = ''
 USING_PROFILE = True
 PROFILE_NAME = 'Profile 1'
+TIME_2FA = 60 # seconds
+# If not using Windows you may want to change the following constants
+PC_USER = ''
 DOWNLOAD_PATH = f'C:\\Users\\{PC_USER}\\Desktop\\{COURSE_NUM}'
 CHROME_DATA_PATH = f'C:\\Users\\{PC_USER}\\AppData\\Local\\Google\\Chrome\\User Data'
-TIME_2FA = 60
 
+# Specifying headers is required to be able to receive Content-Disposition header in get_filename_from_headers_and_update_dict function
 headers = {
     'User-Agent' : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
 }
