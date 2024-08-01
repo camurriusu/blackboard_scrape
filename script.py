@@ -26,67 +26,64 @@ headers = {
 }
 
 
-""" switch_tabs(close)
-
-Took inspiration from: https://www.selenium.dev/documentation/webdriver/interactions/windows/#switching-windows-or-tabs
-
-Each tab or window has its own identifier known as a "window handle".
-- We cycle through each window handle and compare it to the current one the WebDriver is on.
-- If they are different, we switch to that tab.
-- If close = True, we close the tab we were on before switching.
-
-"""
-
 def switch_tabs(close):
+    """
+
+    Took inspiration from: https://www.selenium.dev/documentation/webdriver/interactions/windows/#switching-windows-or-tabs
+    
+    Each tab or window has its own identifier known as a "window handle".
+    - We cycle through each window handle and compare it to the current one the WebDriver is on.
+    - If they are different, we switch to that tab.
+    - If close = True, we close the tab we were on before switching.
+    
+    """
     for win_handle in driver.window_handles:
         if win_handle != driver.current_window_handle:
             if close:
                 driver.close()
             driver.switch_to.window(win_handle)
             break
-
-
-""" update_dict(dict, key, val)
-
-dict must have the following structure where each of its values is a list.
-dict = {
-    key : [val],
-}
-
-Each val that is passed looks like this: val = [['linkurl', 'filename']]
-Replacing val with examples:
-dict = {
-    key : [['linkurl1', 'filename1'], ['linkurl2', 'filename2'], ...],
-}
-
-- If the passed key already exists within the dictionary, we append the passed val to the value list of that key.
-- Else, a new key is created and val is assigned as its value.
-
-Example of the dictionary that is passed to this function:
-links = {
-    'Week 1' : [['linkurl1', 'Intro.pdf'], ['linkurl2', 'Vectors.pdf'], ['linkurl3', 'Parametric Equations.pdf']],
-}
-
-"""
+            
 
 def update_dict(dict, key, val):
+    """
+
+    dict must have the following structure where each of its values is a list.
+    dict = {
+        key : [val],
+    }
+    
+    Each val that is passed looks like this: val = [['linkurl', 'filename']]
+    Replacing val with examples:
+    dict = {
+        key : [['linkurl1', 'filename1'], ['linkurl2', 'filename2'], ...],
+    }
+    
+    - If the passed key already exists within the dictionary, we append the passed val to the value list of that key.
+    - Else, a new key is created and val is assigned as its value.
+    
+    Example of the dictionary that is passed to this function:
+    links = {
+        'Week 1' : [['linkurl1', 'Intro.pdf'], ['linkurl2', 'Vectors.pdf'], ['linkurl3', 'Parametric Equations.pdf']],
+    }
+    
+    """
     if key in dict:
         dict[key].append(val[0])
     else:
         dict[key] = val
 
 
-""" microsoft_login
-
-Called if USING_PROFILE = False. If you do not use a Chrome Profile to store cookies,
-you are required to sign in through a Microsoft portal and perhaps complete 2FA authentication.
-
-This function will automatically complete all steps in the portal except for 2FA where your smartphone
-is required.
-
-"""
-
 def microsoft_login():
+    """
+
+    Called if USING_PROFILE = False. If you do not use a Chrome Profile to store cookies,
+    you are required to sign in through a Microsoft portal and perhaps complete 2FA authentication.
+    
+    This function will automatically complete all steps in the portal except for 2FA where your smartphone
+    is required.
+    
+    """
     # - email
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "i0116"))).send_keys(EMAIL)
     driver.find_element(By.ID, "idSIButton9").click()
@@ -99,16 +96,15 @@ def microsoft_login():
     driver.find_element(By.ID, "idSIButton9").click()
 
 
-""" initialiseDriver(isHeadless)
-
-Initialises the WebDriver.
-- If isHeadless = True, the script will run in headless mode,
-  i.e. only through terminal. Not recommended as scraping may fail.
-- If USING_PROFILE = True, we enter PROFILE_NAME and CHROME_DATA_PATH as arguments.
-
-"""
-
 def initialiseDriver(isHeadless):
+    """
+    
+    Initialises the WebDriver.
+    - If isHeadless = True, the script will run in headless mode,
+      i.e. only through terminal. Not recommended as scraping may fail.
+    - If USING_PROFILE = True, we enter PROFILE_NAME and CHROME_DATA_PATH as arguments.
+    
+    """
     options = webdriver.ChromeOptions()
     if isHeadless:
         options.add_argument("--headless")
@@ -119,26 +115,24 @@ def initialiseDriver(isHeadless):
     return driver
 
 
-""" loginBlackboard()
-
-Simply navigates the Blackboard login page (always required even when using a Chrome Profile).
-
-"""
-
 def loginBlackboard():
+    """
+
+    Simply navigates the Blackboard login page (always required even when using a Chrome Profile).
+
+    """
     driver.get('https://tcd.blackboard.com/')
     if not USING_PROFILE: WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "agree_button"))).click()
     driver.find_element(By.ID, "login-btn").click()
     if not USING_PROFILE: microsoft_login()
 
 
-""" retrieveLinks()
-
-Main function that collects all links and stores them in the links dictionary.
-
-"""
-
 def retrieveLinks():
+    """
+
+    Main function that collects all links and stores them in the links dictionary.
+    
+    """
     # Navigates to the course URL
     driver.get('https://tcd.blackboard.com/ultra/courses/_'+COURSE_NUM+'_1/cl/outline')
     
@@ -221,15 +215,14 @@ def retrieveLinks():
     return links
 
 
-""" get_filename_from_headers_and_update_dict(title_text, file)
-
-Gets file name from a link by analysing its response headers.
-- Searches for the Content-Disposition header and extracts file name from that value.
-- Calls update_dict to update the links dictionary with file name and passed variables.
-
-"""
-
 def get_filename_from_headers_and_update_dict(title_text, file):
+    """
+
+    Gets file name from a link by analysing its response headers.
+    - Searches for the Content-Disposition header and extracts file name from that value.
+    - Calls update_dict to update the links dictionary with file name and passed variables.
+    
+    """
     # For unknown reason the WebElement (file) passed may be invalid hence we require the following check
     # - Only happens if post was a folder
     if file.accessible_name:
@@ -252,26 +245,24 @@ def get_filename_from_headers_and_update_dict(title_text, file):
         return None
 
 
-""" transfer_cookies()
-
-Transfers WebDriver's cookies to requests' session.
-
-"""
-
 def transfer_cookies():
+    """
+    
+    Transfers WebDriver's cookies to requests' session.
+    
+    """
     session = requests.Session()
     for cookie in driver.get_cookies():
         session.cookies.set(cookie['name'], cookie['value'])
     return session
 
 
-""" download_links(links)
-
-Takes the links dictionary and downloads each document organised in folders just as they are divided in Blackboard.
-
-"""
-
 def downloadLinks(links):
+    """ download_links
+
+    Takes the links dictionary and downloads each document organised in folders just as they are divided in Blackboard.
+    
+    """
     # Specify path to download files to and check whether it already exists
     base_dir = DOWNLOAD_PATH
     os.makedirs(base_dir, exist_ok=True)
