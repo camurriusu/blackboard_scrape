@@ -1,13 +1,14 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-from pathvalidate import sanitize_filename
 import requests
 import urllib
 import os
 import re
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from pathvalidate import sanitize_filename
+
 
 COURSE_NUM = '' # Navigate to course page check URL for: _{COURSE_NUM}_1
 EMAIL = ''
